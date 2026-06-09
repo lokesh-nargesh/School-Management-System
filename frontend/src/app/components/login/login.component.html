@@ -1,0 +1,87 @@
+<div class="login-wrapper">
+  <div class="glass-card login-card">
+    <div class="brand-section">
+      <div class="logo">🎓</div>
+      <h2>Smart School System</h2>
+      <p>E-Learning & Operations Portal</p>
+    </div>
+
+    <!-- Tab Headers -->
+    <div class="tab-headers">
+      <button [class.active]="isLoginTab" (click)="isLoginTab = true">Sign In</button>
+      <button [class.active]="!isLoginTab" (click)="isLoginTab = false">Register</button>
+    </div>
+
+    <!-- Error/Success Alerts -->
+    <div class="alert alert-danger" *ngIf="errorMessage">{{ errorMessage }}</div>
+    <div class="alert alert-success" *ngIf="successMessage">{{ successMessage }}</div>
+
+    <!-- Login Form -->
+    <form (ngSubmit)="onLogin()" *ngIf="isLoginTab" class="auth-form">
+      <div class="form-group">
+        <label class="glass-label">Email Address</label>
+        <input type="email" class="glass-input" name="email" [(ngModel)]="loginData.email" required placeholder="admin@school.com">
+      </div>
+      <div class="form-group">
+        <label class="glass-label">Password</label>
+        <input type="password" class="glass-input" name="password" [(ngModel)]="loginData.password" required placeholder="••••••••">
+      </div>
+      <button type="submit" class="btn-primary w-full">Sign In</button>
+    </form>
+
+    <!-- Registration Form -->
+    <form (ngSubmit)="onRegister()" *ngIf="!isLoginTab" class="auth-form scrollable-form">
+      <div class="form-group">
+        <label class="glass-label">Full Name</label>
+        <input type="text" class="glass-input" name="reg-name" [(ngModel)]="registerData.name" required placeholder="John Doe">
+      </div>
+      <div class="form-group">
+        <label class="glass-label">Email Address</label>
+        <input type="email" class="glass-input" name="reg-email" [(ngModel)]="registerData.email" required placeholder="john@example.com">
+      </div>
+      <div class="form-group">
+        <label class="glass-label">Password</label>
+        <input type="password" class="glass-input" name="reg-password" [(ngModel)]="registerData.password" required placeholder="Min 6 characters">
+      </div>
+      <div class="form-group">
+        <label class="glass-label">Role</label>
+        <select class="glass-input" name="reg-role" [(ngModel)]="registerData.role">
+          <option value="STUDENT">Student</option>
+          <option value="TEACHER">Teacher</option>
+          <option value="PARENT">Parent</option>
+          <option value="ADMIN">Administrator</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="glass-label">Phone Number</label>
+        <input type="text" class="glass-input" name="reg-phone" [(ngModel)]="registerData.phone" placeholder="10-digit number">
+      </div>
+
+      <!-- Student Specific Fields -->
+      <div *ngIf="registerData.role === 'STUDENT'" class="role-specific-fields">
+        <div class="form-group">
+          <label class="glass-label">Roll Number</label>
+          <input type="text" class="glass-input" name="reg-roll" [(ngModel)]="registerData.rollNo" placeholder="Class Roll No">
+        </div>
+        <div class="form-group">
+          <label class="glass-label">Parent's Name</label>
+          <input type="text" class="glass-input" name="reg-parent-name" [(ngModel)]="registerData.parentName" placeholder="Father/Mother name">
+        </div>
+        <div class="form-group">
+          <label class="glass-label">Parent's Phone</label>
+          <input type="text" class="glass-input" name="reg-parent-phone" [(ngModel)]="registerData.parentPhone" placeholder="Emergency contact">
+        </div>
+      </div>
+
+      <!-- Teacher Specific Fields -->
+      <div *ngIf="registerData.role === 'TEACHER'" class="role-specific-fields">
+        <div class="form-group">
+          <label class="glass-label">Specialization</label>
+          <input type="text" class="glass-input" name="reg-specialization" [(ngModel)]="registerData.specialization" placeholder="e.g. Mathematics, Physics">
+        </div>
+      </div>
+
+      <button type="submit" class="btn-primary w-full">Create Account</button>
+    </form>
+  </div>
+</div>

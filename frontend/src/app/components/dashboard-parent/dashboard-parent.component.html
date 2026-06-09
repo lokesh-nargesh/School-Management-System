@@ -1,0 +1,24 @@
+<div class="dashboard-container">
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <span class="logo">🎓</span>
+      <h3>Parent Portal</h3>
+    </div>
+    <nav class="sidebar-menu">
+      <button class="active">👪 Parental Tracking</button>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="btn-logout" (click)="logout()">🚪 Logout</button>
+    </div>
+  </aside>
+  <main class="main-content">
+    <div class="welcome-banner glass-card">
+      <h1>Welcome, Parent {{ parentUser?.name }}!</h1>
+      <p>Monitor your child's academic grades, daily attendance report sheets, and outstanding fee invoices.</p>
+    </div>
+    <div class="glass-card mt-24">
+      <h2>Parental Monitoring Console</h2>
+      <p class="mt-8 text-secondary">The REST API services are listening on <strong>port 8080</strong>. Child performance statistics can be reviewed remotely from this portal view.</p>
+    </div>
+  </main>
+</div>

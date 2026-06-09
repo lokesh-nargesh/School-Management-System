@@ -1,0 +1,24 @@
+<div class="dashboard-container">
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <span class="logo">🎓</span>
+      <h3>Admin Panel</h3>
+    </div>
+    <nav class="sidebar-menu">
+      <button class="active">📊 Administration</button>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="btn-logout" (click)="logout()">🚪 Logout</button>
+    </div>
+  </aside>
+  <main class="main-content">
+    <div class="welcome-banner glass-card">
+      <h1>Welcome, Administrator {{ adminUser?.name }}!</h1>
+      <p>Use the REST API endpoints to manage classes, subjects, students, teachers, transport, and notice board settings.</p>
+    </div>
+    <div class="glass-card mt-24">
+      <h2>School Operations Management Console</h2>
+      <p class="mt-8 text-secondary">The REST API services are listening on <strong>port 8080</strong>. Administrative operations can be run remotely from this dashboard view.</p>
+    </div>
+  </main>
+</div>

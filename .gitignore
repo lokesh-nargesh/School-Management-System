@@ -1,0 +1,12 @@
+# Build folders
+backend/build/
+backend/.gradle/
+frontend/dist/
+frontend/node_modules/
+frontend/.angular/
+
+# System / Temp
+.DS_Store
+Thumbs.db
+*.log
+*.tmp

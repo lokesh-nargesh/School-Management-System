@@ -1,0 +1,377 @@
+<div class="dashboard-container">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <span class="logo">🎓</span>
+      <h3>E-Learning Portal</h3>
+    </div>
+    
+    <nav class="sidebar-menu">
+      <button [class.active]="activeTab === 'overview'" (click)="activeTab = 'overview'">📊 Overview</button>
+      <button [class.active]="activeTab === 'materials'" (click)="activeTab = 'materials'">📚 Study Materials</button>
+      <button [class.active]="activeTab === 'assignments'" (click)="activeTab = 'assignments'">📝 Assignments</button>
+      <button [class.active]="activeTab === 'exams'" (click)="activeTab = 'exams'">✏️ Online Quizzes</button>
+      <button [class.active]="activeTab === 'ai-hub'" (click)="activeTab = 'ai-hub'">🤖 AI Hub (Beta)</button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-badge">
+        <div class="avatar">👤</div>
+        <div class="info">
+          <span class="name">{{ studentUser?.name }}</span>
+          <span class="role">Student</span>
+        </div>
+      </div>
+      <button class="btn-logout" (click)="logout()">🚪 Logout</button>
+    </div>
+  </aside>
+
+  <!-- Main Content Area -->
+  <main class="main-content">
+    
+    <!-- OVERVIEW TAB -->
+    <section *ngIf="activeTab === 'overview'" class="tab-content">
+      <div class="welcome-banner glass-card">
+        <h1>Welcome Back, {{ studentUser?.name }}!</h1>
+        <p>Your academic records are looking stable. Check notice board for holiday schedules.</p>
+      </div>
+
+      <!-- Quick Metrics Grid -->
+      <div class="grid-cols-4 dashboard-stats">
+        <div class="glass-card stat-card">
+          <span class="stat-icon">📅</span>
+          <h3>Attendance</h3>
+          <div class="stat-val">{{ attendancePercent | number:'1.1-1' }}%</div>
+          <span class="badge" [class.badge-success]="attendancePercent >= 75" [class.badge-danger]="attendancePercent < 75">
+            {{ attendancePercent >= 75 ? 'Stable' : 'Risk' }}
+          </span>
+        </div>
+        <div class="glass-card stat-card">
+          <span class="stat-icon">📖</span>
+          <h3>Subjects</h3>
+          <div class="stat-val">{{ subjects.length }}</div>
+          <span class="stat-sub">Allocated</span>
+        </div>
+        <div class="glass-card stat-card">
+          <span class="stat-icon">🏆</span>
+          <h3>Average Marks</h3>
+          <div class="stat-val">{{ (aiPrediction?.averageExamScore | number:'1.1-1') || '0.0' }}%</div>
+          <span class="stat-sub">Across Quiz modules</span>
+        </div>
+        <div class="glass-card stat-card">
+          <span class="stat-icon">💰</span>
+          <h3>Fees Status</h3>
+          <div class="stat-val">{{ fees.length > 0 ? fees[0].status : 'PAID' }}</div>
+          <span class="stat-sub">Current Semester</span>
+        </div>
+      </div>
+
+      <!-- Notice Board & Calendar -->
+      <div class="grid-cols-2 mt-24">
+        <div class="glass-card notices-panel">
+          <h2>School Notice Board</h2>
+          <div class="notice-list">
+            <div class="notice-item" *ngFor="let notice of notices">
+              <div class="notice-header">
+                <span class="notice-title">{{ notice.title }}</span>
+                <span class="notice-date">{{ notice.dateCreated | date:'shortDate' }}</span>
+              </div>
+              <p class="notice-desc">{{ notice.content }}</p>
+            </div>
+            <div *ngIf="notices.length === 0" class="empty-state">No announcements active.</div>
+          </div>
+        </div>
+
+        <div class="glass-card academic-history">
+          <h2>Academic Report Cards</h2>
+          <div class="glass-table-container">
+            <table class="glass-table">
+              <thead>
+                <tr>
+                  <th>Exam Title</th>
+                  <th>Marks</th>
+                  <th>Percentage</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let res of results">
+                  <td>{{ res.exam.title }}</td>
+                  <td>{{ res.marksObtained }} / {{ res.exam.maxMarks }}</td>
+                  <td>{{ (res.marksObtained / res.exam.maxMarks)*100 | number:'1.1-1' }}%</td>
+                  <td>
+                    <span class="badge" [class.badge-success]="res.passed" [class.badge-danger]="!res.passed">
+                      {{ res.passed ? 'PASSED' : 'FAILED' }}
+                    </span>
+                  </td>
+                </tr>
+                <tr *ngIf="results.length === 0">
+                  <td colspan="4" style="text-align: center;">No results available.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STUDY MATERIALS TAB -->
+    <section *ngIf="activeTab === 'materials'" class="tab-content">
+      <div class="section-header glass-card flex-between">
+        <div>
+          <h2>E-Learning Study Materials</h2>
+          <p>Read notes, watch video lectures, and download slides uploaded by teachers.</p>
+        </div>
+        <div class="selector-box">
+          <label class="glass-label">Select Subject</label>
+          <select class="glass-input" (change)="onSubjectChange($event)">
+            <option *ngFor="let sub of subjects" [value]="sub.subjectId">{{ sub.subjectName }}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid-cols-3 mt-24">
+        <div class="glass-card material-card" *ngFor="let mat of materials">
+          <div class="material-type-icon" [ngSwitch]="mat.fileType.toUpperCase()">
+            <span *ngSwitchCase="'PDF'">📄</span>
+            <span *ngSwitchCase="'VIDEO'">🎥</span>
+            <span *ngSwitchCase="'PPT'">📊</span>
+            <span *ngSwitchDefault>📝</span>
+          </div>
+          <h3>{{ mat.title }}</h3>
+          <p>{{ mat.description }}</p>
+          <div class="material-meta">
+            <span class="badge badge-info">{{ mat.fileType }}</span>
+            <span class="date">{{ mat.uploadDate | date:'shortDate' }}</span>
+          </div>
+          <a [href]="mat.fileUrl" target="_blank" class="btn-primary mt-12 w-full">📥 Download Note</a>
+        </div>
+
+        <div *ngIf="materials.length === 0" class="glass-card col-span-3 text-center empty-state">
+          <p>No study materials available for this subject.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ASSIGNMENTS TAB -->
+    <section *ngIf="activeTab === 'assignments'" class="tab-content">
+      <div class="section-header glass-card flex-between">
+        <div>
+          <h2>E-Learning Assignments</h2>
+          <p>Submit your homework and review grading remarks.</p>
+        </div>
+        <div class="selector-box">
+          <label class="glass-label">Select Subject</label>
+          <select class="glass-input" (change)="onSubjectChange($event)">
+            <option *ngFor="let sub of subjects" [value]="sub.subjectId">{{ sub.subjectName }}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="glass-card mt-24">
+        <div class="glass-table-container">
+          <table class="glass-table">
+            <thead>
+              <tr>
+                <th>Assignment</th>
+                <th>Due Date</th>
+                <th>Max Marks</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let assign of assignments">
+                <td>{{ assign.title }}<br><small>{{ assign.description }}</small></td>
+                <td>{{ assign.dueDate | date:'medium' }}</td>
+                <td>{{ assign.maxMarks }}</td>
+                <td>
+                  <button class="btn-primary" (click)="selectAssignment(assign)">Submit Work</button>
+                </td>
+              </tr>
+              <tr *ngIf="assignments.length === 0">
+                <td colspan="4" style="text-align: center;">No pending assignments.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Submission Modal -->
+      <div class="modal-backdrop" *ngIf="selectedAssignment">
+        <div class="glass-card modal-content">
+          <h3>Submit Assignment: {{ selectedAssignment.title }}</h3>
+          <p class="mt-8">{{ selectedAssignment.description }}</p>
+          
+          <div class="form-group mt-16">
+            <label class="glass-label">Enter Assignment File URL</label>
+            <input type="text" class="glass-input" [(ngModel)]="submissionFileUrl" placeholder="https://cloudinary.com/my-homework.pdf">
+          </div>
+
+          <div class="modal-actions mt-24">
+            <button class="btn-secondary" (click)="selectedAssignment = null">Cancel</button>
+            <button class="btn-primary" (click)="submitAssignment()">Upload Submission</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ONLINE QUIZZES TAB -->
+    <section *ngIf="activeTab === 'exams'" class="tab-content">
+      <div class="section-header glass-card flex-between">
+        <div>
+          <h2>Online Examination System</h2>
+          <p>Attend time-limited multiple-choice tests and verify results.</p>
+        </div>
+        <div class="selector-box">
+          <label class="glass-label">Select Subject</label>
+          <select class="glass-input" (change)="onSubjectChange($event)">
+            <option *ngFor="let sub of subjects" [value]="sub.subjectId">{{ sub.subjectName }}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid-cols-2 mt-24" *ngIf="!selectedExam">
+        <div class="glass-card exam-card" *ngFor="let exam of exams">
+          <h3>{{ exam.title }}</h3>
+          <div class="exam-info">
+            <span>⏱️ {{ exam.durationMinutes }} Minutes</span>
+            <span>📝 {{ exam.maxMarks }} Max Marks</span>
+          </div>
+          <button class="btn-primary mt-16" (click)="startExam(exam)">📝 Begin Quiz</button>
+        </div>
+
+        <div *ngIf="exams.length === 0" class="glass-card col-span-2 text-center empty-state">
+          <p>No active examinations for this subject.</p>
+        </div>
+      </div>
+
+      <!-- Active Exam Interface -->
+      <div class="glass-card mt-24 quiz-interface" *ngIf="selectedExam">
+        <div class="quiz-header">
+          <h2>{{ selectedExam.title }}</h2>
+          <span class="quiz-timer">⏱️ Active Test</span>
+        </div>
+
+        <!-- Quiz Questions -->
+        <div class="quiz-body" *ngIf="!quizResult">
+          <div class="quiz-question-card" *ngFor="let q of examQuestions; let i = index">
+            <h4>Question {{ i + 1 }}: {{ q.questionText }}</h4>
+            <div class="options-list">
+              <label class="option-item">
+                <input type="radio" [name]="'q-'+i" value="A" [(ngModel)]="studentAnswers[i]">
+                <span>A) {{ q.optionA }}</span>
+              </label>
+              <label class="option-item">
+                <input type="radio" [name]="'q-'+i" value="B" [(ngModel)]="studentAnswers[i]">
+                <span>B) {{ q.optionB }}</span>
+              </label>
+              <label class="option-item">
+                <input type="radio" [name]="'q-'+i" value="C" [(ngModel)]="studentAnswers[i]">
+                <span>C) {{ q.optionC }}</span>
+              </label>
+              <label class="option-item">
+                <input type="radio" [name]="'q-'+i" value="D" [(ngModel)]="studentAnswers[i]">
+                <span>D) {{ q.optionD }}</span>
+              </label>
+            </div>
+          </div>
+
+          <button class="btn-primary mt-24" (click)="submitExam()">Submit Quiz Answers</button>
+        </div>
+
+        <!-- Quiz Result Screen -->
+        <div class="quiz-results" *ngIf="quizResult">
+          <h3>Test Completed!</h3>
+          <div class="result-score">
+            <span>Your Score:</span>
+            <h1>{{ quizResult.marksObtained }} / {{ selectedExam.maxMarks }}</h1>
+          </div>
+          <div class="result-status">
+            <span class="badge" [class.badge-success]="quizResult.passed" [class.badge-danger]="!quizResult.passed">
+              {{ quizResult.passed ? 'PASSED (PASS RATE MAINTAINED)' : 'FAILED (AI REMEDIAL ASSIGNED)' }}
+            </span>
+          </div>
+          <p class="mt-16">Your answers have been graded. Review your study recommendation checklist in the AI Hub.</p>
+          <button class="btn-secondary mt-24" (click)="closeExam()">Return to Dashboard</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- AI HUB TAB (BOT, RECOMMENDATIONS, PREDICTIVE HEALTH) -->
+    <section *ngIf="activeTab === 'ai-hub'" class="tab-content">
+      <div class="welcome-banner glass-card">
+        <h2>AI-Powered Academic Assistant Hub</h2>
+        <p>Leveraging predictive modeling and LLMs to assist in e-learning and support weak students.</p>
+      </div>
+
+      <div class="grid-cols-3 mt-24">
+        <!-- AI Performance Risk Predictor -->
+        <div class="glass-card ai-predictor-panel">
+          <h2>AI Performance Prediction</h2>
+          <div class="gauge-section mt-16 text-center">
+            <div class="risk-gauge" [class.risk-high]="aiPrediction?.riskLevel === 'HIGH RISK'" [class.risk-medium]="aiPrediction?.riskLevel === 'MEDIUM RISK'" [class.risk-low]="aiPrediction?.riskLevel === 'LOW RISK (EXCELLENT / STABLE)'">
+              <span>Status</span>
+              <h2>{{ aiPrediction?.riskLevel || 'Calculating...' }}</h2>
+            </div>
+          </div>
+
+          <div class="predictor-metrics mt-16">
+            <div class="flex-between">
+              <span>Avg score:</span>
+              <strong>{{ aiPrediction?.averageExamScore | number:'1.1-1' }}%</strong>
+            </div>
+            <div class="flex-between mt-8">
+              <span>Attendance:</span>
+              <strong>{{ aiPrediction?.attendanceRate | number:'1.1-1' }}%</strong>
+            </div>
+          </div>
+
+          <!-- Remedial improvement plan checklist -->
+          <div class="improvement-plan mt-24">
+            <h4>Recommended Improvement Plan:</h4>
+            <ul class="plan-list mt-8">
+              <li *ngFor="let item of aiPrediction?.improvementPlan">🔹 {{ item }}</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- AI Study Material Recommender -->
+        <div class="glass-card ai-recommender-panel">
+          <h2>AI Study Recommender</h2>
+          <p class="mt-8 text-secondary">{{ aiRecommendations?.recommendationReason }}</p>
+
+          <div class="recommended-materials mt-16">
+            <div class="material-rec-item" *ngFor="let rec of aiRecommendations?.materials">
+              <span class="rec-icon">📄</span>
+              <div class="rec-info">
+                <strong>{{ rec.title }}</strong>
+                <span>{{ rec.subject.subjectName }} ({{ rec.fileType }})</span>
+              </div>
+              <a [href]="rec.fileUrl" target="_blank" class="badge badge-info">Open</a>
+            </div>
+            <div *ngIf="!aiRecommendations?.materials?.length" class="empty-state">No recommendations ready.</div>
+          </div>
+        </div>
+
+        <!-- AI Chatbot Interface -->
+        <div class="glass-card ai-chatbot-panel">
+          <h2>AI Academic Assistant</h2>
+          <p class="text-secondary">Ask questions about syllabus, calendar, admissions, or fees.</p>
+
+          <div class="chat-thread mt-16">
+            <div class="chat-message-bubble" *ngFor="let chat of chatHistory" [class.chat-user]="chat.sender === 'user'" [class.chat-ai]="chat.sender === 'ai'">
+              <div class="bubble-text">{{ chat.text }}</div>
+              <div class="bubble-time">{{ chat.timestamp | date:'shortTime' }}</div>
+            </div>
+          </div>
+
+          <div class="chat-input-box mt-12">
+            <input type="text" class="glass-input" [(ngModel)]="chatMessage" (keyup.enter)="sendMessage()" placeholder="Ask support bot...">
+            <button class="btn-primary" (click)="sendMessage()">Send</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>

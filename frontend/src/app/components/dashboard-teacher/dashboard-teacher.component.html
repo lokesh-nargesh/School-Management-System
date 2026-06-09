@@ -1,0 +1,24 @@
+<div class="dashboard-container">
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <span class="logo">🎓</span>
+      <h3>Teacher Portal</h3>
+    </div>
+    <nav class="sidebar-menu">
+      <button class="active">📝 Teaching Panel</button>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="btn-logout" (click)="logout()">🚪 Logout</button>
+    </div>
+  </aside>
+  <main class="main-content">
+    <div class="welcome-banner glass-card">
+      <h1>Welcome, Teacher {{ teacherUser?.name }}!</h1>
+      <p>Enter student marks, mark daily attendance, and upload learning resources for your assigned classes.</p>
+    </div>
+    <div class="glass-card mt-24">
+      <h2>Academic Delivery Console</h2>
+      <p class="mt-8 text-secondary">The REST API services are listening on <strong>port 8080</strong>. Teaching operations can be run remotely from this dashboard view.</p>
+    </div>
+  </main>
+</div>
