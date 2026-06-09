@@ -5,6 +5,19 @@
       <h2>Smart School System</h2>
       <p>E-Learning & Operations Portal</p>
     </div>
+ 
+    <div class="settings-container">
+      <button type="button" class="settings-btn" (click)="toggleSettings()">⚙️ Connection Settings</button>
+    </div>
+
+    <!-- Connection Settings Panel -->
+    <div class="settings-panel" *ngIf="showSettings">
+      <div class="form-group">
+        <label class="glass-label">Backend API Server URL</label>
+        <input type="text" class="glass-input" name="backend-url" [(ngModel)]="backendUrl" (ngModelChange)="saveBackendUrl()" placeholder="http://localhost:8080">
+        <small class="helper-text">Use LocalTunnel (e.g. https://funny-sheep-sing.loca.lt) or localhost.</small>
+      </div>
+    </div>
 
     <!-- Tab Headers -->
     <div class="tab-headers">

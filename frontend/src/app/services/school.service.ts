@@ -7,10 +7,22 @@ import { AuthService } from './auth.service';
   providedIn: 'root'
 })
 export class SchoolService {
-  private baseAdminUrl = 'http://localhost:8080/api/admin';
-  private baseTeacherUrl = 'http://localhost:8080/api/teacher';
-  private baseStudentUrl = 'http://localhost:8080/api/student';
-  private baseAiUrl = 'http://localhost:8080/api/ai';
+  private get baseAdminUrl() {
+    const base = localStorage.getItem('backend_url') || 'http://localhost:8080';
+    return `${base}/api/admin`;
+  }
+  private get baseTeacherUrl() {
+    const base = localStorage.getItem('backend_url') || 'http://localhost:8080';
+    return `${base}/api/teacher`;
+  }
+  private get baseStudentUrl() {
+    const base = localStorage.getItem('backend_url') || 'http://localhost:8080';
+    return `${base}/api/student`;
+  }
+  private get baseAiUrl() {
+    const base = localStorage.getItem('backend_url') || 'http://localhost:8080';
+    return `${base}/api/ai`;
+  }
 
   constructor(private http: HttpClient, private authService: AuthService) {}
 

@@ -29,8 +29,18 @@ export class LoginComponent {
   };
   errorMessage = '';
   successMessage = '';
+  showSettings = false;
+  backendUrl = localStorage.getItem('backend_url') || 'http://localhost:8080';
 
   constructor(private authService: AuthService, private router: Router) {}
+
+  toggleSettings() {
+    this.showSettings = !this.showSettings;
+  }
+
+  saveBackendUrl() {
+    localStorage.setItem('backend_url', this.backendUrl);
+  }
 
   onLogin() {
     this.errorMessage = '';

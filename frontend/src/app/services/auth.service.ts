@@ -6,7 +6,10 @@ import { Observable, tap } from 'rxjs';
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:8080/api/auth';
+  private get apiUrl() {
+    const base = localStorage.getItem('backend_url') || 'http://localhost:8080';
+    return `${base}/api/auth`;
+  }
 
   constructor(private http: HttpClient) {}
 
